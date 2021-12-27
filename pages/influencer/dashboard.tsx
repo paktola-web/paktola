@@ -3,11 +3,12 @@ import React, { MouseEventHandler, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { useRouter } from 'next/router';
 
-import { supabase } from '../src/utils/SupabaseClient';
+import { supabase } from '../../src/utils/SupabaseClient';
 
 const Dashboard = () => {
   const router = useRouter();
   const [user, setUser] = useState<User | null>();
+  const [link, setLink] = useState<User | null>();
 
   const handleLogOut: MouseEventHandler = async (e) => {
     e.preventDefault();
@@ -33,8 +34,13 @@ const Dashboard = () => {
       },
     )
     const body = await response.json()
+    console.log("body", body)
     window.location.href = body.url
+    saveProfile()
   }
+  
+
+     
 
   useEffect(() => {
     const getProfile = () => {
@@ -47,12 +53,26 @@ const Dashboard = () => {
       }
     };
 
+
     getProfile();
   }, []);
 
   if (!user) {
     // Currently loading asynchronously User Supabase Information
     return null;
+  }
+
+  const saveProfile = async() => {
+    console.log("link", link)
+    const { data, error } = await supabase
+      .from('profiles')
+      .insert([
+        { 
+          id: user.id,
+          email: user.user_metadata.email,
+          avatar_url: user.user_metadata.avatar_url,
+        }
+      ])
   }
 
   return (
@@ -76,7 +96,7 @@ const Dashboard = () => {
           className="mt-6 text-lg text-white font-semibold bg-green-500 py-3 px-6 rounded-md focus:outline-none focus:ring-2"
           onClick={createStripeAccount}
         >
-          Connect Stripe
+        Connect to Stripe
         </button>
 
         <button

@@ -10,7 +10,7 @@ const Callback = () => {
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, sessionState) => {
         if (sessionState?.user) {
-          router.push('/dashboard');
+          router.push('/influencer/dashboard');
         }
       }
     );
