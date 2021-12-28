@@ -1,8 +1,8 @@
-import React, { MouseEventHandler, useState } from 'react';
+import React, { MouseEventHandler, useState } from "react";
 
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 
-import { supabase } from '../src/utils/SupabaseClient';
+import { supabase } from "../src/utils/SupabaseClient";
 
 const SignIn = () => {
   const router = useRouter();
@@ -12,10 +12,10 @@ const SignIn = () => {
 
     const { error } = await supabase.auth.signIn(
       {
-        provider: 'google',
+        provider: "google",
       },
       {
-        redirectTo: 'http://localhost:3000/callback/',
+        redirectTo: "http://localhost:3000/callback/",
       }
     );
 
@@ -40,7 +40,6 @@ const SignIn = () => {
           </button>
 
           <hr className="bg-gray-600 border-0 h-px my-8" />
-
         </div>
       </div>
     </div>

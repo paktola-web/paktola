@@ -1,4 +1,5 @@
 import React, { MouseEventHandler, useEffect, useState } from 'react';
+import { GetStaticProps, GetStaticPaths, GetServerSideProps } from 'next'
 
 import { User } from '@supabase/supabase-js';
 import { useRouter } from 'next/router';
@@ -53,7 +54,6 @@ const Dashboard = () => {
       }
     };
 
-
     getProfile();
   }, []);
 
@@ -64,33 +64,27 @@ const Dashboard = () => {
 
   const saveProfile = async() => {
     console.log("link", link)
-    const { data, error } = await supabase
-      .from('profiles')
-      .insert([
-        { 
-          id: user.id,
-          email: user.user_metadata.email,
-          avatar_url: user.user_metadata.avatar_url,
-        }
-      ])
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .insert([
+          { 
+            id: user.id,
+            email: user.user_metadata.email,
+            avatar_url: user.user_metadata.avatar_url,
+          }
+        ])
+      console.log(data, error)
+    } catch(error) {
+      console.log(error)
+    }
   }
 
   return (
     <div className="h-screen flex items-center justify-center bg-gray-800">
       <div className="max-w-lg w-full text-center">
         <h1 className="text-2xl font-semibold text-white">
-          *****Welcome, your email is {user.email}
-          *****id is: {user.id}
-          *****phone is {user.phone}
-          *****phone: {user.phone}
-          *****avatar: {user.user_metadata.avatar_url}
-          *****email: {user.user_metadata.email}
-          *****email verified: {user.user_metadata.email_verified}
-          *****full name: {user.user_metadata.full_name}
-          *****name: {user.user_metadata.name}
-          *****picture: {user.user_metadata.picture}
-          *****provider_id: {user.user_metadata.provider_id}
-          *****sub: {user.user_metadata.sub}
+          *****Welcome, USER OBJECT...{user.id}
         </h1>
         <button
           className="mt-6 text-lg text-white font-semibold bg-green-500 py-3 px-6 rounded-md focus:outline-none focus:ring-2"
@@ -109,5 +103,6 @@ const Dashboard = () => {
     </div>
   );
 };
+
 
 export default Dashboard;
