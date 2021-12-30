@@ -1,13 +1,13 @@
 import { supabase } from '../../src/utils/SupabaseClient';
 import { AppProps } from 'next/app';
-import {withRouter} from 'next/router'
-import GoogleCalendar from '../../components/GoogleCalendar'
+import {withRouter} from 'next/router';
+import {DatePicker} from '../../components/DatePicker';
 
 const Profile = withRouter((props) => {
   return (
     <div>
     <h1>{props.router.query.id}</h1>
-    <GoogleCalendar></GoogleCalendar>
+    <DatePicker influencerId={props.router.query.id}></DatePicker>
     </div>
   )
 })

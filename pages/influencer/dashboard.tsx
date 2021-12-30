@@ -39,9 +39,6 @@ const Dashboard = () => {
     window.location.href = body.url
     saveProfile()
   }
-  
-
-     
 
   useEffect(() => {
     const getProfile = () => {
