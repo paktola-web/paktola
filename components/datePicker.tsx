@@ -1,20 +1,21 @@
-
-type Date = {
-  date: string
-  availableDates: string[]
-}
-
-
-const DatePicker = ({availableDates}: Date) => {
+import { GetServerSideProps } from 'next'
+const DatePicker = ({availableDates}: any) => {
   return (
-    <ul>
-    {availableDates.map(date => <li>{date}</li>)}
-    </ul>
+    <div>
+      <div>
+        <h1>Influencers Id</h1>
+      </div>
+      <div>
+        <ul>
+          <li>{availableDates}</li>
+        </ul>
+      </div>
+    </div>
   )
 }
 
-export const getServerSideProps = async (context: any) => {
-  const res = await fetch(`http://localhost:3000/api/getAvailableDates?id=${context.id}`) 
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
+  const res = await fetch(`http://localhost:3000/api/freeBusy?id=${context.props.influencerId}`) 
 
   const availableDates = await res.json()
 

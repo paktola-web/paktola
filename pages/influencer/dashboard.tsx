@@ -1,10 +1,19 @@
-import React, { MouseEventHandler, useEffect, useState } from 'react';
-import { GetStaticProps, GetStaticPaths, GetServerSideProps } from 'next'
+import React, { MouseEventHandler, useEffect, useState } from "react";
+import { GetStaticProps, GetStaticPaths, GetServerSideProps } from "next";
 
-import { User } from '@supabase/supabase-js';
-import { useRouter } from 'next/router';
+import { User } from "@supabase/supabase-js";
+import { useRouter } from "next/router";
 
-import { supabase } from '../../src/utils/SupabaseClient';
+import { supabase } from "../../src/utils/SupabaseClient";
+import { google } from "googleapis";
+
+const oauth2Client = new google.auth.OAuth2(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_API_KEY,
+  process.env.GOOGLE_REDIRECT_URL
+);
+
+const scopes = ["https://www.googleapis.com/auth/calendar"];
 
 const Dashboard = () => {
   const router = useRouter();
@@ -19,26 +28,36 @@ const Dashboard = () => {
     if (error) {
       alert(JSON.stringify(error));
     } else {
-      router.push('/signin');
+      router.push("/signin");
     }
   };
 
-  const createStripeAccount = async() => {
+  const createStripeAccount = async () => {
     const response = await fetch(
-      process.env.NEXT_PUBLIC_BASE_URL + '/api/stripeFlow',
+      process.env.NEXT_PUBLIC_BASE_URL + "/api/stripeFlow",
       {
-        method: 'POST',
+        method: "POST",
         body: JSON.stringify(user),
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-      },
-    )
-    const body = await response.json()
-    console.log("body", body)
-    window.location.href = body.url
-    saveProfile()
-  }
+      }
+    );
+    const body = await response.json();
+    console.log("body", body);
+    window.location.href = body.url;
+    saveProfile();
+  };
+
+  const createAuthUrl = () => {
+    const url = oauth2Client.generateAuthUrl({
+      // 'online' (default) or 'offline' (gets refresh_token)
+      access_type: "default",
+
+      // If you only need one scope you can pass it as a string
+      scope: scopes,
+    });
+  };
 
   useEffect(() => {
     const getProfile = () => {
@@ -47,9 +66,10 @@ const Dashboard = () => {
       if (profile) {
         setUser(profile);
       } else {
-        router.push('/signin');
+        router.push("/signin");
       }
     };
+
 
     getProfile();
   }, []);
@@ -59,23 +79,21 @@ const Dashboard = () => {
     return null;
   }
 
-  const saveProfile = async() => {
-    console.log("link", link)
+  const saveProfile = async () => {
+    console.log("link", link);
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .insert([
-          { 
-            id: user.id,
-            email: user.user_metadata.email,
-            avatar_url: user.user_metadata.avatar_url,
-          }
-        ])
-      console.log(data, error)
-    } catch(error) {
-      console.log(error)
+      const { data, error } = await supabase.from("profiles").insert([
+        {
+          id: user.id,
+          email: user.user_metadata.email,
+          avatar_url: user.user_metadata.avatar_url,
+        },
+      ]);
+      console.log(data, error);
+    } catch (error) {
+      console.log(error);
     }
-  }
+  };
 
   return (
     <div className="h-screen flex items-center justify-center bg-gray-800">
@@ -87,7 +105,13 @@ const Dashboard = () => {
           className="mt-6 text-lg text-white font-semibold bg-green-500 py-3 px-6 rounded-md focus:outline-none focus:ring-2"
           onClick={createStripeAccount}
         >
-        Connect to Stripe
+          Connect to Stripe
+        </button>
+        <button
+          className="mt-6 text-lg text-white font-semibold bg-green-500 py-3 px-6 rounded-md focus:outline-none focus:ring-2"
+          onClick={createAuthUrl}
+        >
+          Authorize Google Calendar
         </button>
 
         <button
@@ -100,6 +124,5 @@ const Dashboard = () => {
     </div>
   );
 };
-
 
 export default Dashboard;
