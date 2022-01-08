@@ -5,15 +5,6 @@ import { User } from "@supabase/supabase-js";
 import { useRouter } from "next/router";
 
 import { supabase } from "../../src/utils/SupabaseClient";
-import { google } from "googleapis";
-
-const oauth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_API_KEY,
-  process.env.GOOGLE_REDIRECT_URL
-);
-
-const scopes = ["https://www.googleapis.com/auth/calendar"];
 
 const Dashboard = () => {
   const router = useRouter();
@@ -49,16 +40,6 @@ const Dashboard = () => {
     saveProfile();
   };
 
-  const createAuthUrl = () => {
-    const url = oauth2Client.generateAuthUrl({
-      // 'online' (default) or 'offline' (gets refresh_token)
-      access_type: "default",
-
-      // If you only need one scope you can pass it as a string
-      scope: scopes,
-    });
-  };
-
   useEffect(() => {
     const getProfile = () => {
       const profile = supabase.auth.user();
@@ -69,7 +50,6 @@ const Dashboard = () => {
         router.push("/signin");
       }
     };
-
 
     getProfile();
   }, []);
@@ -107,12 +87,6 @@ const Dashboard = () => {
         >
           Connect to Stripe
         </button>
-        <button
-          className="mt-6 text-lg text-white font-semibold bg-green-500 py-3 px-6 rounded-md focus:outline-none focus:ring-2"
-          onClick={createAuthUrl}
-        >
-          Authorize Google Calendar
-        </button>
 
         <button
           className="mt-6 text-lg text-white font-semibold bg-green-500 py-3 px-6 rounded-md focus:outline-none focus:ring-2"
@@ -124,5 +98,34 @@ const Dashboard = () => {
     </div>
   );
 };
+
+export async function getServerSideProps() {
+  const {google} = require('googleapis');
+  const oauth2Client = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_API_KEY,
+    process.env.GOOGLE_REDIRECT_URL
+  );
+
+  // generate a url that asks permissions for blogger and google calendar scopes
+  const scopes = [
+    "https://www.googleapis.com/auth/blogger",
+    "https://www.googleapis.com/auth/calendar",
+  ];
+
+  const url = oauth2Client.generateAuthUrl({
+    // 'online' (default) or 'offline' (gets refresh_token)
+    access_type: "online",
+
+    // if you only need one scope you can pass it as a string
+    scope: scopes,
+  });
+  console.log("url", url);
+  return {
+    props: { url }, // will be passed to the page component as props
+  }
+}
+
+
 
 export default Dashboard;
