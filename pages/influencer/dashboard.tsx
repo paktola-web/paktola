@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 
 import { supabase } from "../../src/utils/SupabaseClient";
 
-const Dashboard = () => {
+const Dashboard = ({ url }) => {
   const router = useRouter();
   const [user, setUser] = useState<User | null>();
   const [link, setLink] = useState<User | null>();
@@ -59,6 +59,10 @@ const Dashboard = () => {
     return null;
   }
 
+  const connectCalendar = () => {
+    return (window.location.href = url);
+  };
+
   const saveProfile = async () => {
     console.log("link", link);
     try {
@@ -87,6 +91,12 @@ const Dashboard = () => {
         >
           Connect to Stripe
         </button>
+        <button
+          className="mt-6 text-lg text-white font-semibold bg-green-500 py-3 px-6 rounded-md focus:outline-none focus:ring-2"
+          onClick={connectCalendar}
+        >
+          Connect Calendar
+        </button>
 
         <button
           className="mt-6 text-lg text-white font-semibold bg-green-500 py-3 px-6 rounded-md focus:outline-none focus:ring-2"
@@ -100,7 +110,7 @@ const Dashboard = () => {
 };
 
 export async function getServerSideProps() {
-  const {google} = require('googleapis');
+  const { google } = require("googleapis");
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_API_KEY,
@@ -123,9 +133,7 @@ export async function getServerSideProps() {
   console.log("url", url);
   return {
     props: { url }, // will be passed to the page component as props
-  }
+  };
 }
-
-
 
 export default Dashboard;
