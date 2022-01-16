@@ -6,7 +6,11 @@ import { useRouter } from "next/router";
 
 import { supabase } from "../../src/utils/SupabaseClient";
 
-const Dashboard = ({ url }) => {
+type Dashboard = {
+  url: string
+}
+
+const Dashboard = ({ url }: Dashboard) => {
   const router = useRouter();
   const [user, setUser] = useState<User | null>();
   const [link, setLink] = useState<User | null>();
@@ -109,7 +113,7 @@ const Dashboard = ({ url }) => {
   );
 };
 
-export async function getServerSideProps() {
+export const getServerSideProps: GetServerSideProps = async () => {
   const { google } = require("googleapis");
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
